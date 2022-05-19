@@ -1,21 +1,21 @@
 import java.util.Arrays;
+import java.util.Iterator;
 
+public class MyArrayList implements MyList, Iterable {
 
-public class MyArrayList implements MyList {
+    private int count;
+    private Object[] array;
 
-    public int count;
-    Object[] array;
-
-    public MyArrayList() {
+    private MyArrayList() {
         count = 0;
         array = new Object[10];
     }
 
-    public void printAll() {
+    private void printAll() {
         System.out.println(Arrays.toString(array));
     }
 
-    public void expand(int index) {
+    private void expand(int index) {
         int temp = this.array.length;
 
         while (index >= temp) {
@@ -23,80 +23,62 @@ public class MyArrayList implements MyList {
         }
 
         Object[] array = new Object[temp];
-
-        if (this.array.length > index) {
-            System.arraycopy(this.array, 0, array, 0, index);
-            System.arraycopy(this.array, index, array, index + 1, this.array.length - index - 1);
-        }
-
-        else {
-            System.arraycopy(this.array, 0, array, 0, this.array.length);
-        }
-
+        System.arraycopy(this.array, 0, array, 0, this.array.length);
         this.array = array;
+    }
+
+    private void shiftRight(int index) {
+        Object[] array = new Object[this.array.length];
+        System.arraycopy(this.array, 0, array, 0, index);
+        System.arraycopy(this.array, index, array, index + 1, this.array.length - index - 1);
+        this.array = array;
+    }
+
+    private void shiftLeft(int index) {
+        Object[] array = new Object[this.array.length];
+        System.arraycopy(this.array, 0, array, 0, this.array.length);
+        System.arraycopy(array, index + 1, this.array, index, array.length - index - 1);
     }
 
     @Override
     public void add(Object elem) {
         add(count, elem);
-
-//        if (count == this.array.length) {
-//            Object[] array = new Object[this.array.length * 2];
-//            System.arraycopy(this.array, 0, array, 0, this.array.length);
-//            System.arraycopy(array, 0, this.array, 0, this.array.length);
-//            this.array = array;
-//        }
-//
-//        this.array[count] = elem;
-//        count++;
     }
 
     @Override
     public void add(int index, Object elem) {
-
-//        int temp = index >= this.array.length ? (index / 10 + 1) * 10 : this.array.length;
-//        Object[] array = new Object[temp];
-//
-//        if (this.array.length > index) {
-//            System.arraycopy(this.array, 0, array, 0, index);
-//            array[index] = elem;
-//            System.arraycopy(this.array, index, array, index + 1, this.array.length - index - 1);
-//            count++;
-//        }
-//
-//        else {
-//            System.arraycopy(this.array, 0, array, 0, this.array.length);
-//            array[index] = elem;
-//            count++;
-//        }
-//
-//        this.array = array;
-
-        if (index > count && index < array.length) {
+        if (index < count) {
+            shiftRight(index);
             array[index] = elem;
         }
+
+        else if (index < array.length) {
+            array[index] = elem;
+        }
+
         else {
             expand(index);
             array[index] = elem;
         }
 
         count = index > count ? ++index : ++count;
-
     }
 
     @Override
     public Object set(int index, Object elem) {
-        Object temp = array[index];
-//        array[index] = elem;
-//        count = index > count ? ++index : count++;
 
-//          if (index > array.length) {
-            array[index] = elem;
-//        }
-//        else {
-//            expand(index);
-//            array[index] = elem;
-//        }
+        Object temp;
+
+        if (index >= array.length) {
+              expand(index);
+              array[index] = elem;
+              temp = null;            //здесь мог быть Exception
+          }
+
+         else {
+              temp = array[index];
+              array[index] = elem;
+          }
 
         count = index > count ? ++index : count;
 
@@ -116,32 +98,13 @@ public class MyArrayList implements MyList {
             return true;
         }
 
-
-
-//        boolean temp = false;
-//
-//        for (int i = 0; i < array.length; i++) {
-//            if (array[i] == null) continue;
-//            else if (array[i].equals(elem)) {
-//                array[i] = null;
-//                temp = true;
-//                count--;
-//            }
-//        }
-//        return temp;
     }
-
 
     @Override
     public Object remove(int index) {
-        Object temp = this.array[index];
-        Object[] array = new Object[this.array.length];
-        System.arraycopy(this.array, 0, array, 0, this.array.length);
-        System.arraycopy(array, index + 1, this.array, index, array.length - index - 1);
-
-//        if (temp != null) {
+        Object temp = this.array[index];        //здесь может быть Exception
+        shiftLeft(index);
         count--;
-//        }
 
         return temp;
     }
@@ -151,66 +114,36 @@ public class MyArrayList implements MyList {
         Object[] array = new Object[this.array.length];
         Arrays.fill(array, 0, this.array.length, null);
         this.array = array;
-                                    //System.arraycopy(array, 0, this.array, 0, array.length);
         count = 0;
     }
 
     @Override
     public Object get(int index) {
-        return array[index];
+        return array[index];            //здесь может быть Exception
     }
 
     @Override
     public int indexOf(Object elem) {
-//        int temp = 0;
-//
-//        for (int i = 0; i < 10; i++) {
-//            if (elem == null && array[i] == null) {
-//                temp = i;
-//            } else if (array[i] == null) {
-//                continue;
-//            } else if (array[i].equals(elem)) {
-//                temp = i;
-//                break;
-//            }
-//        }
-
         for (int i = 0; i < array.length; i++) {
             if (elem == null) {
                 if (array[i] == null) {
                     return i;
                 }
             }
-            else {
-                if (elem.equals(array[i])) {
-                    return i;
+
+         else {
+              if (elem.equals(array[i])) {
+                  return i;
                 }
             }
+
         }
 
         return -1;
-
-
-        /*
-        int temp = 0;
-
-        for (int i = 0; i < array.length; i++) {
-            if (array[i].equals(elem)) temp = i;
-        }
-        return temp;
-        */
     }
 
     @Override
     public boolean contains(Object elem) {
-//        boolean temp = false;
-//
-//        for (int i = 0; i < array.length; i++) {
-//            if (array[i] == null) continue;
-//            else if (array[i].equals(elem)) temp = true;
-//        }
-//
-//        return temp;
         return indexOf(elem) != -1;
     }
 
@@ -219,63 +152,109 @@ public class MyArrayList implements MyList {
         return count;
     }
 
+    @Override
+    public Iterator iterator() {
+        return new MyIterator();
+    }
+
+
+    private class MyIterator implements Iterator {
+
+        private int iteratorCount = 0;
+
+        @Override
+        public boolean hasNext() {
+            return count > iteratorCount;
+        }
+
+        @Override
+        public Object next() {
+            return array[iteratorCount++];          //здесь может быть Exception
+        }
+
+        @Override
+        public void remove() {
+            MyArrayList.this.remove(--iteratorCount);           //здесь может быть ArrayIndexOutOfBoundsException
+            iteratorCount++;
+        }
+
+
+    }
+
+
     public static void main(String[] args) {
         MyArrayList obj = new MyArrayList();
 
         obj.add("f0");
         obj.printAll();
-//        System.out.println(obj.get(0));
         System.out.println("count = " + obj.count);
         obj.add("f1");
         obj.printAll();
-//        System.out.println(obj.get(1));
         System.out.println("count = " + obj.count);
         obj.add("f2");
         obj.printAll();
-//        System.out.println(obj.get(2));
         System.out.println("count = " + obj.count);
-
-        obj.set(18, "f18");
-        System.out.println(obj.get(18));
-        System.out.println("set отработал; count = " + obj.count);
-
         obj.add("f3");
         obj.printAll();
-//        System.out.println(obj.get(3));
         System.out.println("count = " + obj.count);
         obj.add("f4");
         obj.printAll();
-//        System.out.println(obj.get(4));
         System.out.println("count = " + obj.count);
         obj.add("f5");
         obj.printAll();
-//        System.out.println(obj.get(5));
         System.out.println("count = " + obj.count);
         obj.add("f6");
         obj.printAll();
-//        System.out.println(obj.get(6));
         System.out.println("count = " + obj.count);
         obj.add("f7");
         obj.printAll();
-//        System.out.println(obj.get(7));
         System.out.println("count = " + obj.count);
         obj.add("f8");
         obj.printAll();
-//        System.out.println(obj.get(8));
         System.out.println("count = " + obj.count);
         obj.add("f9");
         obj.printAll();
-//        System.out.println(obj.get(9));
         System.out.println("count = " + obj.count);
         obj.add("f10");
         obj.printAll();
-//        System.out.println(obj.get(10));
         System.out.println("count = " + obj.count);
 
+        System.out.println("add11");
+        obj.add(11, "f11");
+        obj.printAll();
+
+        System.out.println("add8");
+        obj.add(8, "s8");
+        obj.printAll();
+        System.out.println("count = " + obj.count);
+
+        System.out.println("set4");
+        System.out.println(obj.set(4, "s4"));
+        obj.printAll();
+        System.out.println("count = " + obj.count);
+
+        System.out.println("set19");
+        obj.set(19, "s19");
+        obj.printAll();
+        System.out.println("count = " + obj.count);
+
+        System.out.println("set20");
+        obj.set(20, "s20");
+        obj.printAll();
+        System.out.println("count = " + obj.count);
 
         obj.add(21, "f21");
         obj.printAll();
-//        System.out.println(obj.get(21));
+        System.out.println("count = " + obj.count);
+
+        System.out.println("remove19");
+        obj.remove(19);
+        obj.printAll();
+        System.out.println("count = " + obj.count);
+
+        System.out.println("remove18");
+        obj.remove(18);
+        obj.printAll();
         System.out.println("count = " + obj.count);
 
 //        obj.set(8, "f8");
@@ -283,6 +262,7 @@ public class MyArrayList implements MyList {
 //        System.out.println("count = " + obj.count);
 
         obj.printAll();
+
 
         int x;
         x = obj.indexOf("f6");
@@ -302,36 +282,22 @@ public class MyArrayList implements MyList {
 
         obj.printAll();
 
-        //obj.clear();
-        //System.out.println(obj.get(8));
-        //System.out.println("count = " + obj.count);
 
         /*
-        obj.add("f0");
-        System.out.println(obj.get(0));
-        System.out.println("count = " + obj.count);
-
-        obj.add(1, "f1");
-        System.out.println(obj.get(1));
-        System.out.println("count = " + obj.count);
-
-        obj.add("f1");
-        System.out.println(obj.get(2));
-        System.out.println("count = " + obj.count);
-
-        obj.set(2, "f2");
-        System.out.println(obj.get(2));
-        System.out.println("count = " + obj.count);
-
-        obj.remove("f1");
-        System.out.println(obj.get(1));
-        System.out.println("count = " + obj.count);
-
         System.out.println(obj.contains("f2"));
 
         obj.clear();
         System.out.println(obj.get(0));
         System.out.println("count = " + obj.count);
         */
+
+
+        Iterator iterator = obj.iterator();
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+
+        iterator.remove();
+        obj.printAll();
     }
 }
