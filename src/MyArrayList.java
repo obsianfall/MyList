@@ -257,10 +257,6 @@ public class MyArrayList implements MyList, Iterable {
         obj.printAll();
         System.out.println("count = " + obj.count);
 
-//        obj.set(8, "f8");
-//        System.out.println(obj.get(8));
-//        System.out.println("count = " + obj.count);
-
         obj.printAll();
 
 
