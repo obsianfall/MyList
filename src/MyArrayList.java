@@ -28,6 +28,9 @@ public class MyArrayList implements MyList, Iterable {
     }
 
     private void shiftRight(int index) {
+        if (count == this.array.length) {
+            expand(count);
+        }
         Object[] array = new Object[this.array.length];
         System.arraycopy(this.array, 0, array, 0, index);
         System.arraycopy(this.array, index, array, index + 1, this.array.length - index - 1);
@@ -70,15 +73,14 @@ public class MyArrayList implements MyList, Iterable {
         Object temp;
 
         if (index >= array.length) {
-              expand(index);
-              array[index] = elem;
-              temp = null;            //здесь мог быть Exception
-          }
+            expand(index);
+            array[index] = elem;
+            temp = null;            //здесь мог быть Exception
 
-         else {
-              temp = array[index];
-              array[index] = elem;
-          }
+        } else {
+            temp = array[index];
+            array[index] = elem;
+        }
 
         count = index > count ? ++index : count;
 
@@ -102,11 +104,19 @@ public class MyArrayList implements MyList, Iterable {
 
     @Override
     public Object remove(int index) {
-        Object temp = this.array[index];        //здесь может быть Exception
-        shiftLeft(index);
-        count--;
+        Object elem;
+        try {
+            elem = this.array[index];        //здесь мог быть Exception
+            shiftLeft(index);
+            count--;
 
-        return temp;
+
+        } catch (ArrayIndexOutOfBoundsException e) {
+            e.printStackTrace();
+            throw new IndexOutOfBoundsException(index);
+        }
+
+        return elem;
     }
 
     @Override
@@ -119,7 +129,14 @@ public class MyArrayList implements MyList, Iterable {
 
     @Override
     public Object get(int index) {
-        return array[index];            //здесь может быть Exception
+        Object elem;
+        try {
+            elem = array[index];
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
+            throw new IndexOutOfBoundsException(index);
+        }
+        return elem;
     }
 
     @Override
@@ -160,22 +177,25 @@ public class MyArrayList implements MyList, Iterable {
 
     private class MyIterator implements Iterator {
 
-        private int iteratorCount = 0;
+        private int nextCount = 0;
+        private int previousCount = -1;
 
         @Override
         public boolean hasNext() {
-            return count > iteratorCount;
+            return count > nextCount;
         }
 
         @Override
         public Object next() {
-            return array[iteratorCount++];          //здесь может быть Exception
+            Object elem = array[nextCount++];          //здесь может быть Exception
+            previousCount = nextCount - 1;
+            return elem;
         }
 
         @Override
         public void remove() {
-            MyArrayList.this.remove(--iteratorCount);           //здесь может быть ArrayIndexOutOfBoundsException
-            iteratorCount++;
+            MyArrayList.this.remove(previousCount);           //здесь может быть ArrayIndexOutOfBoundsException
+            previousCount = -1;
         }
 
 
@@ -213,6 +233,10 @@ public class MyArrayList implements MyList, Iterable {
         obj.printAll();
         System.out.println("count = " + obj.count);
         obj.add("f9");
+        obj.printAll();
+        System.out.println("count = " + obj.count);
+        System.out.println("add 8s8");
+        obj.add(8, "8s8");
         obj.printAll();
         System.out.println("count = " + obj.count);
         obj.add("f10");
@@ -273,7 +297,7 @@ public class MyArrayList implements MyList, Iterable {
 //        System.out.println("count = " + obj.count);
 
         System.out.println(obj.remove(7));
-        System.out.println(obj.remove(13));
+        System.out.println(obj.remove(12));
         System.out.println("count = " + obj.count);
 
         obj.printAll();
@@ -295,5 +319,7 @@ public class MyArrayList implements MyList, Iterable {
 
         iterator.remove();
         obj.printAll();
+
+        System.out.println(obj.remove(93));
     }
 }
