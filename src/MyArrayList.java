@@ -1,5 +1,6 @@
 import java.util.Arrays;
-import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 public class MyArrayList implements MyList, Iterable {
 
@@ -113,7 +114,7 @@ public class MyArrayList implements MyList, Iterable {
 
         } catch (ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
-            throw new IndexOutOfBoundsException(index);
+            throw new IndexOutOfBoundsException(e.getMessage());
         }
 
         return elem;
@@ -134,7 +135,7 @@ public class MyArrayList implements MyList, Iterable {
             elem = array[index];
         } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
-            throw new IndexOutOfBoundsException(index);
+            throw new IndexOutOfBoundsException(e.getMessage());
         }
         return elem;
     }
@@ -170,14 +171,15 @@ public class MyArrayList implements MyList, Iterable {
     }
 
     @Override
-    public Iterator iterator() {
+    public ListIterator iterator() {
         return new MyIterator();
     }
 
 
-    private class MyIterator implements Iterator {
+    private class MyIterator implements ListIterator {
 
         private int nextCount = 0;
+        private int lastReturnedIndex = -1;
         private int previousCount = -1;
 
         @Override
@@ -187,15 +189,87 @@ public class MyArrayList implements MyList, Iterable {
 
         @Override
         public Object next() {
-            Object elem = array[nextCount++];          //здесь может быть Exception
-            previousCount = nextCount - 1;
-            return elem;
+            if (hasNext()) {
+                Object elem = array[nextCount++];
+                lastReturnedIndex = nextCount - 1;
+                previousCount = nextCount - 1;
+                return elem;
+            }
+
+            else {
+                throw new NoSuchElementException();
+            }
+
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return previousCount >= 0;
+        }
+
+        @Override
+        public Object previous() {
+            if (hasPrevious()) {
+                Object elem = array[previousCount--];
+                lastReturnedIndex = previousCount + 1;
+                nextCount = previousCount + 1;
+                return elem;
+            }
+
+            else {
+                throw new NoSuchElementException();
+            }
+        }
+
+        @Override
+        public int nextIndex() {
+            if (hasNext()) {
+                return nextCount;
+            }
+
+            else {
+                return count; //размер списка, согласно условию
+            }
+        }
+
+        @Override
+        public int previousIndex() {
+            if (hasPrevious()) {
+                return previousCount;
+            }
+
+            else {
+                return -1;
+            }
         }
 
         @Override
         public void remove() {
-            MyArrayList.this.remove(previousCount);           //здесь может быть ArrayIndexOutOfBoundsException
-            previousCount = -1;
+            if (lastReturnedIndex == -1) {
+                throw new IllegalStateException();
+            }
+            else {
+                MyArrayList.this.remove(lastReturnedIndex);
+                lastReturnedIndex = -1;
+            }
+
+        }
+
+        @Override
+        public void set(Object o) {
+            if (lastReturnedIndex == -1) {
+                throw new IllegalStateException();
+            }
+            else {
+                MyArrayList.this.set(lastReturnedIndex, o);
+            }
+
+        }
+
+        @Override
+        public void add(Object o) {
+            MyArrayList.this.add(nextCount++, o);
+            previousCount = nextCount - 1;
         }
 
 
@@ -311,15 +385,60 @@ public class MyArrayList implements MyList, Iterable {
         System.out.println("count = " + obj.count);
         */
 
+        System.out.println("Начало листИтератора");
 
-        Iterator iterator = obj.iterator();
-        while (iterator.hasNext()) {
-            System.out.println(iterator.next());
+        ListIterator iterator = obj.iterator();
+        System.out.println("hasNext: " + iterator.hasNext());
+        System.out.println("nextIndex: " + iterator.nextIndex());
+        System.out.println("next: " + iterator.next());
+        System.out.println("hasPrevious: " + iterator.hasPrevious());
+        System.out.println("previousIndex: " + iterator.previousIndex());
+        System.out.println("nextIndex: " + iterator.nextIndex());
+        System.out.println("previous: " + iterator.previous());
+        System.out.println("next: " + iterator.next());
+        System.out.println("next: " + iterator.next());
+        System.out.println("next: " + iterator.next());
+        System.out.println("previousIndex: " + iterator.previousIndex());
+        System.out.println("nextIndex: " + iterator.nextIndex());
+        iterator.set("F1");
+        System.out.println("set F1 отработал");
+        System.out.println("previous: " + iterator.previous());
+        System.out.println("next: " + iterator.next());
+        iterator.add("f1.5");
+        System.out.println("add f1.5 отработал");
+        obj.printAll();
+        System.out.println("previous: " + iterator.previous());
+        System.out.println("next: " + iterator.next());
+        System.out.println("next: " + iterator.next());
+        System.out.println("nextIndex: " + iterator.nextIndex());
+
+        while (iterator.hasPrevious()) {
+            iterator.previous();
         }
 
-        iterator.remove();
+        System.out.println("Цикл возврата в начало списка отработал");
+
+        System.out.println("nextIndex: " + iterator.nextIndex());
+        System.out.println("previousIndex: " + iterator.previousIndex());
+
+
         obj.printAll();
 
-        System.out.println(obj.remove(93));
+        for (int i = 0; iterator.hasNext(); i++) {
+            if (i != 0 & i % 4 == 0) {
+                iterator.remove();
+                iterator.previous();
+            }
+
+            iterator.next();
+        }
+
+        System.out.println("Цикл на удаление каждого четвертого элемента отработал");
+
+        obj.printAll();
+//
+//        iterator.next();
+//
+//        System.out.println(obj.remove(93));
     }
 }
