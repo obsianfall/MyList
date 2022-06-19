@@ -76,7 +76,7 @@ public class MyArrayList implements MyList, Iterable {
         if (index >= array.length) {
             expand(index);
             array[index] = elem;
-            temp = null;            //здесь мог быть Exception
+            temp = null;            //in order to avoid Exception
 
         } else {
             temp = array[index];
@@ -107,7 +107,7 @@ public class MyArrayList implements MyList, Iterable {
     public Object remove(int index) {
         Object elem;
         try {
-            elem = this.array[index];        //здесь мог быть Exception
+            elem = this.array[index];        //in order to avoid Exception
             shiftLeft(index);
             count--;
 
@@ -228,7 +228,7 @@ public class MyArrayList implements MyList, Iterable {
             }
 
             else {
-                return count; //размер списка, согласно условию
+                return count; //list size, according to the condition
             }
         }
 
@@ -360,11 +360,11 @@ public class MyArrayList implements MyList, Iterable {
 
         int x;
         x = obj.indexOf("f6");
-        System.out.println("indexOf отработал: " + x);
+        System.out.println("indexOf 'f6' output: " + x);
         System.out.println(obj.contains("f23"));
 
-        System.out.println("indexOf отработал: " + obj.indexOf("f100500"));
-        System.out.println("indexOf отработал: " + obj.indexOf(null));
+        System.out.println("indexOf 'f100500' output: " + obj.indexOf("f100500"));
+        System.out.println("indexOf 'null' output: " + obj.indexOf(null));
 
 //        obj.remove("f7");
 //        obj.remove("f13");
@@ -385,7 +385,7 @@ public class MyArrayList implements MyList, Iterable {
         System.out.println("count = " + obj.count);
         */
 
-        System.out.println("Начало листИтератора");
+        System.out.println("ListIterator starts here");
 
         ListIterator iterator = obj.iterator();
         System.out.println("hasNext: " + iterator.hasNext());
@@ -401,11 +401,11 @@ public class MyArrayList implements MyList, Iterable {
         System.out.println("previousIndex: " + iterator.previousIndex());
         System.out.println("nextIndex: " + iterator.nextIndex());
         iterator.set("F1");
-        System.out.println("set F1 отработал");
+        System.out.println("set 'F1' worked out here");
         System.out.println("previous: " + iterator.previous());
         System.out.println("next: " + iterator.next());
         iterator.add("f1.5");
-        System.out.println("add f1.5 отработал");
+        System.out.println("add 'f1.5' worked out here");
         obj.printAll();
         System.out.println("previous: " + iterator.previous());
         System.out.println("next: " + iterator.next());
@@ -416,7 +416,7 @@ public class MyArrayList implements MyList, Iterable {
             iterator.previous();
         }
 
-        System.out.println("Цикл возврата в начало списка отработал");
+        System.out.println("While loop worked out here; returned to the top of the list");
 
         System.out.println("nextIndex: " + iterator.nextIndex());
         System.out.println("previousIndex: " + iterator.previousIndex());
@@ -433,7 +433,7 @@ public class MyArrayList implements MyList, Iterable {
             iterator.next();
         }
 
-        System.out.println("Цикл на удаление каждого четвертого элемента отработал");
+        System.out.println("For loop worked out here; deleted each fourth element of the list");
 
         obj.printAll();
 //
